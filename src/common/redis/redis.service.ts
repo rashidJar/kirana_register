@@ -2,11 +2,6 @@ import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
 import { RateLimitConfig } from '../interceptors/rateLimitInterceptor';
-import {
-  BLOCK_DURATION,
-  REQUEST_ALLOWED,
-  TIME_DURATION,
-} from './redis.constant';
 
 @Injectable()
 export class RedisService {
@@ -37,17 +32,11 @@ export class RedisService {
     }
   }
 
-  private getRateLimitConfig(): RateLimitConfig {
-    return {
-      points: REQUEST_ALLOWED,
-      duration: TIME_DURATION,
-      blockDuration: BLOCK_DURATION,
-    };
-  }
-
-  async isRequestAllowed(key: string): Promise<boolean> {
+  async isRequestAllowed(
+    key: string,
+    config: RateLimitConfig,
+  ): Promise<boolean> {
     const now = Date.now();
-    const config = this.getRateLimitConfig();
 
     const multi = this.redis.multi();
 
@@ -69,12 +58,11 @@ export class RedisService {
     return requestCount < config.points;
   }
 
-  async getTimeToReset(key: string): Promise<number> {
+  async getTimeToReset(key: string, config: RateLimitConfig): Promise<number> {
     const oldest = await this.redis.zrange(key, 0, 0, 'WITHSCORES');
     if (!oldest.length) return 0;
 
     const oldestTimestamp = parseInt(oldest[1]);
-    const config = this.getRateLimitConfig();
     const reset = oldestTimestamp + config.duration * 1000;
 
     return Math.max(0, Math.ceil((reset - Date.now()) / 1000));

@@ -36,8 +36,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         request['user'] = {
           id: payload.id,
           email: payload.email,
-          role: payload.role,
-          storeId: payload.storeId,
+          roles: payload.roles,
         };
       } catch (error) {
         throw new UnauthorizedException('Invalid token', error);

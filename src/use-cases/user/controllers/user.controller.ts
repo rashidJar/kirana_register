@@ -16,7 +16,6 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('/store')
-  @Roles(UserRole.ADMIN)
   async createStore(@User('id') userId: string, @Body() body: CreateStoreDto) {
     return this.userService.createStore(userId, body);
   }

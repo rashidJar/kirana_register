@@ -2,9 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import mongoose from 'mongoose';
+import helmet from 'helmet';
+import * as compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(helmet());
+  app.use(compression());
 
   // Global pipes
   app.useGlobalPipes(
@@ -14,19 +19,6 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-
-  // Log MongoDB connection events
-  mongoose.connection.on('connected', () => {
-    console.log('MongoDB connected successfully');
-  });
-
-  mongoose.connection.on('error', (err) => {
-    console.error('MongoDB connection error:', err);
-  });
-
-  mongoose.connection.on('disconnected', () => {
-    console.log('MongoDB disconnected');
-  });
 
   // Handle application shutdown
   process.on('SIGINT', async () => {

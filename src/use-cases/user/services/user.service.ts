@@ -6,6 +6,7 @@ import {
   AddUserToStoreDto,
   CreateStoreDto,
 } from 'src/use-cases/store/dto/store.dto';
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -19,16 +20,18 @@ export class UserService {
     if (!user) {
       throw new Error('User not found');
     }
-    if (user.storeId) {
-      throw new Error('User already has a store');
-    }
     const store = await this.storeService.createStore(body);
-    await this.addStoreToUser(userId, store._id.toString(), UserRole.ADMIN);
+    await this.addStoreToUser(user, store._id.toString(), UserRole.ADMIN);
     return store;
   }
 
-  async addStoreToUser(userId: string, storeId: string, role: UserRole) {
-    return this.userRepository.addStoreToUser(userId, storeId, role);
+  async addStoreToUser(user: User, storeId: string, role: UserRole) {
+    const existingRoles = user.roles || new Map<string, UserRole>();
+    existingRoles.set(storeId, role);
+    return this.userRepository.addStoreToUser(
+      user._id.toString(),
+      existingRoles,
+    );
   }
 
   async addUserToStore(adminId: string, body: AddUserToStoreDto) {
@@ -37,20 +40,10 @@ export class UserService {
     if (!adminUser || !user) {
       throw new Error('User not found');
     }
-    if (!adminUser.storeId || adminUser.storeId !== body.storeId) {
-      throw new Error('User does not have access to store');
-    }
-    if (user.storeId) {
-      throw new Error('User already has a store');
-    }
     const store = await this.storeService.findById(body.storeId);
     if (!store) {
       throw new Error('Store not found');
     }
-    return this.addStoreToUser(
-      user._id.toString(),
-      store._id.toString(),
-      body.role,
-    );
+    return this.addStoreToUser(user, store._id.toString(), body.role);
   }
 }

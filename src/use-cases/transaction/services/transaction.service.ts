@@ -18,7 +18,7 @@ export class TransactionService {
     private readonly storeService: StoreService,
   ) {}
 
-  async createTransaction(data: CreateTransactionDto) {
+  async createTransaction(userId: string, data: CreateTransactionDto) {
     const store = await this.storeService.findById(data.storeId);
     if (!store) {
       throw new NotFoundException('Store not found');
@@ -28,15 +28,17 @@ export class TransactionService {
       'INR',
     );
     const amountInINR = data.amount / exchangeRate;
-    const trnsactionData = {
+    const transactionData = {
       amount: data.amount,
       currency: data.currency,
       type: data.type,
       storeId: data.storeId,
       amountInINR,
+      userId,
     };
 
-    const transaction = await this.transactionRepository.create(trnsactionData);
+    const transaction =
+      await this.transactionRepository.create(transactionData);
 
     return transaction;
   }

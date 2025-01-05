@@ -27,8 +27,7 @@ export class AuthResponse {
     _id: string;
     name: string;
     email: string;
-    role: UserRole;
-    storeId?: string;
+    roles: Map<string, UserRole>;
   };
   access_token: string;
 }

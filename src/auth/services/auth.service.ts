@@ -19,7 +19,7 @@ export class AuthService {
     const payload = {
       id: user._id,
       email: user.email,
-      role: user.role,
+      roles: user.roles,
     };
 
     const token = this.jwtService.sign(payload, {
@@ -31,8 +31,7 @@ export class AuthService {
         _id: user._id.toString(),
         name: user.name,
         email: user.email,
-        role: user.role,
-        storeId: user.storeId,
+        roles: user.roles,
       },
       access_token: token,
     };
@@ -50,9 +49,6 @@ export class AuthService {
       ...body,
       password: hashedPassword,
     });
-
-    if (user) {
-    }
 
     return this.generateAuthResponse(user);
   }

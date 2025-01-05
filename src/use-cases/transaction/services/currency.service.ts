@@ -56,7 +56,6 @@ export class CurrencyService {
         },
         timeout: 5000,
       });
-      console.log(response, 'response hai nhai');
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {

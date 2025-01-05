@@ -16,11 +16,12 @@ export class User {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ required: false, enum: UserRole })
-  role: UserRole;
-
-  @Prop({ required: false, default: null })
-  storeId: string;
+  @Prop({
+    type: Map,
+    of: String,
+    enum: UserRole,
+  })
+  roles: Map<string, UserRole>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

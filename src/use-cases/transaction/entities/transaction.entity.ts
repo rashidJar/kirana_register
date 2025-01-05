@@ -21,6 +21,9 @@ export class Transaction {
 
   @Prop({ type: mongoose.Types.ObjectId, ref: 'Store', required: true })
   storeId: string;
+
+  @Prop({ required: true })
+  userId: string;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
